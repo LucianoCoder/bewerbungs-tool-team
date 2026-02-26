@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bewerbungs-Manager (Team Vault)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+
+    <div id="loginOverlay" class="overlay">
+        <div class="login-card">
+            <h1>🔐 Tresor-Zugang hello</h1>
+            <p>Geben Sie das Master-Passwort ein.<br><small>Dieses wird nirgendwo gespeichert.</small></p>
+            
+            <div class="password-container">
+                <input type="password" id="masterPassword" placeholder="Master-Passwort" autocomplete="current-password">
+                <button type="button" id="togglePassword" class="btn-toggle-pw" title="Passwort anzeigen">👁️</button>
+            </div>
+            
+            <button onclick="unlockVault()">Tresor öffnen</button>
+        </div>
+    </div>
+
+    <div class="container blurred" id="mainContainer">
+        
+        <div class="header-container">
+            <h1>Bewerbungs-Manager <span style="font-size: 0.5em; background: #e8f0fe; color: #1a73e8; padding: 4px 8px; border-radius: 4px; vertical-align: middle;">TEAM</span></h1>
+            <button class="btn-danger" onclick="lockVault()">🔒 Sperren</button>
+        </div>
+        
+        <div class="card">
+            <h2>Neuen Bewerber erfassen</h2>
+            <div style="display: flex; gap: 10px; flex-direction: column;">
+                <button onclick="prepareManualEntry()" style="background-color: #555; width: fit-content;">Leeres Formular öffnen</button>
+                
+                <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="font-size: 0.9em; color: #666;">Oder JSON-Daten (aus lokaler KI) importieren:</label>
+                    <textarea id="jsonImportArea" rows="3" placeholder='{"name": "Max Mustermann", ...}' style="width: 100%; margin-top: 5px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;"></textarea>
+                    <button onclick="importJSON()" style="margin-top: 10px; background-color: #1a73e8; width: fit-content;">JSON Laden</button>
+                </div>
+            </div>
+            <p id="uploadStatus" style="font-size: 0.9em; margin-top: 10px; color: #666;"></p>
+        </div>
+
+        <div id="resultSection" class="card hidden" style="border-top: 5px solid #1a73e8;">
+            <h2 id="formTitle">Details</h2>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="data-grid">
+                    <div class="field"><label>Name</label><input type="text" id="inName" required></div>
+                    <div class="field"><label>Geburtsdatum</label><input type="text" id="inBirthDate" placeholder="TT.MM.JJJJ"></div>
+                    <div class="field"><label>E-Mail</label><input type="email" id="inEmail"></div>
+                    <div class="field"><label>Telefon</label><input type="text" id="inPhone"></div>
+                    <div class="field"><label>Adresse</label><input type="text" id="inAddress" style="grid-column: span 2;"></div>
+                </div>
+                <div class="field" style="margin-top: 15px;">
+                    <label>Berufserfahrung</label>
+                    <textarea id="inExperience" rows="6" placeholder="Hier die Berufserfahrung als Text eingeben..."></textarea>
+                </div>
+                <div class="action-btns" style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-save">Verschlüsselt Speichern</button>
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('resultSection').classList.add('hidden')">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Datenbank</h2>
+            <div class="table-container">
+                <table id="savedResumesTable">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell">Gelesen</th>
+                            <th>Geburtsdatum</th>
+                            <th>Name</th>
+                            <th>E-Mail</th>
+                            <th style="width: 50px;"></th> 
+                        </tr>
+                    </thead>
+                    <tbody id="savedResumesBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "bewerbungsmanagement-tool-online",
+  "version": "1.0.0",
+  "description": "Online Team-Version (ohne lokale KI)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.1",
+    "node-fetch": "^2.7.0"
+  }
+}
