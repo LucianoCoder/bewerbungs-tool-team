@@ -28,6 +28,8 @@ button:hover { background-color: #1557b0; }
 .btn-save:hover { background-color: #2d8e47; }
 .btn-cancel { background-color: #666; }
 .btn-cancel:hover { background-color: #444; }
+.btn-edit { background-color: #fbbc05; color: #333; }
+.btn-edit:hover { background-color: #e0a800; }
 .btn-danger { background-color: #d93025; padding: 10px 15px; }
 .btn-danger:hover { background-color: #b3261e; }
 .btn-delete-icon { background: transparent; color: #d93025; font-size: 1.2em; padding: 5px; margin: 0; border-radius: 4px; }
@@ -64,8 +66,10 @@ button:hover { background-color: #1557b0; }
 
 /* Grid & Tables */
 .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.comments-stack { display: flex; flex-direction: column; gap: 15px; } /* Neu für übereinanderliegende Kommentare */
 .field { display: flex; flex-direction: column; gap: 5px; }
 .checkbox-cell { width: 50px; text-align: center; }
+.num-cell { width: 30px; text-align: center; color: #888; font-weight: bold; } /* Neue Spalte für Nummerierung */
 input[type="checkbox"] { cursor: pointer; transform: scale(1.3); }
 
 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -74,3 +78,14 @@ th { background-color: #f8f9fa; color: #5f6368; font-size: 0.85em; text-transfor
 .clickable-row { transition: background 0.2s; }
 .clickable-row:hover { background-color: #f8faff; cursor: pointer; }
 .is-read { opacity: 0.6; background-color: #fafafa; }
+
+/* Ansichts-Elemente & Kommentare */
+.view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.view-item { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #e8eaed; }
+.view-item span { color: #5f6368; display: block; font-size: 0.85em; margin-bottom: 3px; }
+.view-item .view-value { display: block; word-break: break-word; font-weight: normal; color: #333; } /* Keine Fettschrift mehr */
+
+.comment-box { background: #f4f6f8; border-left: 4px solid #1a73e8; padding: 12px; border-radius: 0 6px 6px 0; }
+.comment-box strong { color: #1a73e8; font-size: 0.9em; text-transform: uppercase; }
+.comment-text { margin-top: 8px; font-size: 0.95em; white-space: pre-wrap; color: #333; min-height: 20px; }
+textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical; }

@@ -11,7 +11,7 @@
 
     <div id="loginOverlay" class="overlay">
         <div class="login-card">
-            <h1>🔐 Tresor-Zugang hello hello</h1>
+            <h1>🔐 Tresor-Zugang</h1>
             <p>Geben Sie das Master-Passwort ein.<br><small>Dieses wird nirgendwo gespeichert.</small></p>
             
             <div class="password-container">
@@ -44,8 +44,38 @@
             <p id="uploadStatus" style="font-size: 0.9em; margin-top: 10px; color: #666;"></p>
         </div>
 
+        <div id="viewSection" class="card hidden" style="border-top: 5px solid #34a853;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <h2 id="viewName" style="margin: 0; font-size: 1.8em; color: #202124;">Name</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-edit" onclick="openEditMode()">✏️ Bearbeiten</button>
+                    <button class="btn-cancel" onclick="document.getElementById('viewSection').classList.add('hidden')">✕</button>
+                </div>
+            </div>
+
+            <div class="view-grid">
+                <div class="view-item"><span>Geburtsdatum</span><div id="viewBirthDate" class="view-value"></div></div>
+                <div class="view-item"><span>E-Mail</span><div id="viewEmail" class="view-value"></div></div>
+                <div class="view-item"><span>Telefon</span><div id="viewPhone" class="view-value"></div></div>
+                <div class="view-item"><span>Adresse</span><div id="viewAddress" class="view-value"></div></div>
+            </div>
+
+            <div class="view-item" style="margin-bottom: 25px;">
+                <span>Berufserfahrung</span>
+                <div id="viewExperience" class="view-value" style="white-space: pre-wrap; margin-top: 5px;"></div>
+            </div>
+
+            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 5px;">Team Kommentare</h3>
+            <div class="comments-stack">
+                <div class="comment-box"><strong>Greg</strong><div id="viewCommentGreg" class="comment-text"></div></div>
+                <div class="comment-box"><strong>Dario</strong><div id="viewCommentDario" class="comment-text"></div></div>
+                <div class="comment-box"><strong>Luci</strong><div id="viewCommentLuci" class="comment-text"></div></div>
+                <div class="comment-box"><strong>Marcel</strong><div id="viewCommentMarcel" class="comment-text"></div></div>
+            </div>
+        </div>
+
         <div id="resultSection" class="card hidden" style="border-top: 5px solid #1a73e8;">
-            <h2 id="formTitle">Details</h2>
+            <h2 id="formTitle">Details bearbeiten</h2>
             <form id="editForm">
                 <input type="hidden" id="editId">
                 <div class="data-grid">
@@ -59,8 +89,17 @@
                     <label>Berufserfahrung</label>
                     <textarea id="inExperience" rows="6" placeholder="Hier die Berufserfahrung als Text eingeben..."></textarea>
                 </div>
-                <div class="action-btns" style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button type="submit" class="btn-save">Verschlüsselt Speichern</button>
+
+                <h3 style="margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Team Kommentare bearbeiten</h3>
+                <div class="comments-stack">
+                    <div class="field"><label>Kommentar Greg</label><textarea id="inCommentGreg" rows="3" placeholder="Gregs Notizen..."></textarea></div>
+                    <div class="field"><label>Kommentar Dario</label><textarea id="inCommentDario" rows="3" placeholder="Darios Notizen..."></textarea></div>
+                    <div class="field"><label>Kommentar Luci</label><textarea id="inCommentLuci" rows="3" placeholder="Lucis Notizen..."></textarea></div>
+                    <div class="field"><label>Kommentar Marcel</label><textarea id="inCommentMarcel" rows="3" placeholder="Marcels Notizen..."></textarea></div>
+                </div>
+
+                <div class="action-btns" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-save">💾 Verschlüsselt Speichern</button>
                     <button type="button" class="btn-cancel" onclick="document.getElementById('resultSection').classList.add('hidden')">Abbrechen</button>
                 </div>
             </form>
@@ -73,7 +112,7 @@
                     <thead>
                         <tr>
                             <th class="checkbox-cell">Gelesen</th>
-                            <th>Geburtsdatum</th>
+                            <th class="num-cell">#</th> <th>Geburtsdatum</th>
                             <th>Name</th>
                             <th>E-Mail</th>
                             <th style="width: 50px;"></th> 

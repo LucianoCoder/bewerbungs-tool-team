@@ -47,6 +47,6 @@ app.delete('/resumes/:id', async (req, res) => {
     }
 });
 
-// Port für Cloud-Hosting angepasst (process.env.PORT ist wichtig für Render/Heroku)
+// Port für Cloud-Hosting angepasst
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Online-Server läuft auf Port ${PORT}`));

@@ -1,5 +1,6 @@
 let vaultKey = ""; 
 let allResumes = [];
+let currentApplicantIndex = -1; 
 
 // --- TRESOR LOGIK ---
 async function unlockVault() {
@@ -80,7 +81,7 @@ function renderList(rawData) {
             <td class="checkbox-cell" onclick="event.stopPropagation()">
                 <input type="checkbox" ${r.isRead ? 'checked' : ''} onchange="toggleReadStatus('${r._id}', this.checked)">
             </td>
-            <td>${r.birthDate || '—'}</td>
+            <td class="num-cell">${i + 1}</td> <td>${r.birthDate || '—'}</td>
             <td><strong>${r.name || 'Unbekannt'}</strong></td>
             <td>${r.email || '—'}</td>
             <td onclick="event.stopPropagation()">
@@ -94,6 +95,8 @@ async function deleteResume(id) {
     if (confirm("Möchten Sie diesen Bewerber wirklich dauerhaft löschen?")) {
         try {
             await fetch(`/resumes/${id}`, { method: 'DELETE' });
+            document.getElementById('viewSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
             loadDatabase(); 
         } catch (e) { alert("Fehler beim Löschen."); }
     }
@@ -101,13 +104,18 @@ async function deleteResume(id) {
 
 document.getElementById('editForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
     const dataObj = {
         name: document.getElementById('inName').value,
         birthDate: document.getElementById('inBirthDate').value,
         email: document.getElementById('inEmail').value,
         phone: document.getElementById('inPhone').value,
         address: document.getElementById('inAddress').value,
-        experience: document.getElementById('inExperience').value 
+        experience: document.getElementById('inExperience').value,
+        commentGreg: document.getElementById('inCommentGreg').value,
+        commentDario: document.getElementById('inCommentDario').value,
+        commentLuci: document.getElementById('inCommentLuci').value,
+        commentMarcel: document.getElementById('inCommentMarcel').value
     };
 
     const payload = {
@@ -126,13 +134,13 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
     loadDatabase();
 });
 
-// NEU: JSON Import Logik
 function importJSON() {
     const jsonText = document.getElementById('jsonImportArea').value;
     if (!jsonText) return alert("Bitte JSON-Text einfügen.");
     
     try {
         const parsedData = JSON.parse(jsonText);
+        document.getElementById('viewSection').classList.add('hidden'); 
         fillForm(parsedData);
         document.getElementById('jsonImportArea').value = ""; 
     } catch (e) {
@@ -143,6 +151,7 @@ function importJSON() {
 
 function fillForm(d) {
     document.getElementById('resultSection').classList.remove('hidden');
+    
     document.getElementById('editId').value = d._id || "";
     document.getElementById('inName').value = d.name || "";
     document.getElementById('inBirthDate').value = d.birthDate || "";
@@ -161,17 +170,65 @@ function fillForm(d) {
     } else {
         expText = d.experience || "";
     }
-    
     document.getElementById('inExperience').value = expText;
+
+    document.getElementById('inCommentGreg').value = d.commentGreg || "";
+    document.getElementById('inCommentDario').value = d.commentDario || "";
+    document.getElementById('inCommentLuci').value = d.commentLuci || "";
+    document.getElementById('inCommentMarcel').value = d.commentMarcel || "";
+    
     document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
 }
 
+function showView(d) {
+    document.getElementById('resultSection').classList.add('hidden');
+    document.getElementById('viewSection').classList.remove('hidden');
+    
+    document.getElementById('viewName').innerText = d.name || "Unbekannt";
+    document.getElementById('viewBirthDate').innerText = d.birthDate || "—";
+    document.getElementById('viewEmail').innerText = d.email || "—";
+    document.getElementById('viewPhone').innerText = d.phone || "—";
+    document.getElementById('viewAddress').innerText = d.address || "—";
+    
+    let expText = d.experience || "Keine Angaben";
+    if (Array.isArray(d.experience)) {
+        expText = d.experience.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join('\n\n');
+    }
+    document.getElementById('viewExperience').innerText = expText;
+
+    document.getElementById('viewCommentGreg').innerText = d.commentGreg || "Noch kein Kommentar";
+    document.getElementById('viewCommentDario').innerText = d.commentDario || "Noch kein Kommentar";
+    document.getElementById('viewCommentLuci').innerText = d.commentLuci || "Noch kein Kommentar";
+    document.getElementById('viewCommentMarcel').innerText = d.commentMarcel || "Noch kein Kommentar";
+
+    ['Greg', 'Dario', 'Luci', 'Marcel'].forEach(name => {
+        const el = document.getElementById(`viewComment${name}`);
+        el.style.color = d[`comment${name}`] ? '#333' : '#9aa0a6';
+        el.style.fontStyle = d[`comment${name}`] ? 'normal' : 'italic';
+    });
+
+    document.getElementById('viewSection').scrollIntoView({ behavior: 'smooth' });
+}
+
 function showDetails(i) { 
-    if (allResumes[i].secure) fillForm(allResumes[i]); 
-    else alert("Zugriff verweigert: Falsches Passwort oder beschädigte Daten."); 
+    if (allResumes[i].secure) {
+        currentApplicantIndex = i;
+        showView(allResumes[i]);
+    } else {
+        alert("Zugriff verweigert: Falsches Passwort oder beschädigte Daten."); 
+    }
+}
+
+function openEditMode() {
+    if (currentApplicantIndex > -1) {
+        document.getElementById('viewSection').classList.add('hidden');
+        fillForm(allResumes[currentApplicantIndex]);
+    }
 }
 
 function prepareManualEntry() {
+    currentApplicantIndex = -1;
+    document.getElementById('viewSection').classList.add('hidden');
     fillForm({});
     document.getElementById('formTitle').innerText = "Neuen Bewerber erfassen";
 }
@@ -185,12 +242,10 @@ async function toggleReadStatus(id, isRead) {
     loadDatabase();
 }
 
-// Enter-Taste im Login-Feld
 document.getElementById('masterPassword').addEventListener('keypress', (e) => { 
     if(e.key === 'Enter') unlockVault(); 
 });
 
-// Passwort anzeigen / verbergen
 document.getElementById('togglePassword').addEventListener('click', function() {
     const pwInput = document.getElementById('masterPassword');
     if (pwInput.type === 'password') {
