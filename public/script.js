@@ -112,10 +112,18 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         phone: document.getElementById('inPhone').value,
         address: document.getElementById('inAddress').value,
         experience: document.getElementById('inExperience').value,
+        
         commentGreg: document.getElementById('inCommentGreg').value,
+        ratingGreg: document.getElementById('inRatingGreg').value,
+        
         commentDario: document.getElementById('inCommentDario').value,
+        ratingDario: document.getElementById('inRatingDario').value,
+        
         commentLuci: document.getElementById('inCommentLuci').value,
-        commentMarcel: document.getElementById('inCommentMarcel').value
+        ratingLuci: document.getElementById('inRatingLuci').value,
+        
+        commentMarcel: document.getElementById('inCommentMarcel').value,
+        ratingMarcel: document.getElementById('inRatingMarcel').value
     };
 
     const payload = {
@@ -173,9 +181,16 @@ function fillForm(d) {
     document.getElementById('inExperience').value = expText;
 
     document.getElementById('inCommentGreg').value = d.commentGreg || "";
+    document.getElementById('inRatingGreg').value = d.ratingGreg || "";
+    
     document.getElementById('inCommentDario').value = d.commentDario || "";
+    document.getElementById('inRatingDario').value = d.ratingDario || "";
+    
     document.getElementById('inCommentLuci').value = d.commentLuci || "";
+    document.getElementById('inRatingLuci').value = d.ratingLuci || "";
+    
     document.getElementById('inCommentMarcel').value = d.commentMarcel || "";
+    document.getElementById('inRatingMarcel').value = d.ratingMarcel || "";
     
     document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
 }
@@ -197,14 +212,29 @@ function showView(d) {
     document.getElementById('viewExperience').innerText = expText;
 
     document.getElementById('viewCommentGreg').innerText = d.commentGreg || "Noch kein Kommentar";
+    document.getElementById('viewRatingGreg').innerText = d.ratingGreg ? `(${d.ratingGreg})` : "";
+    
     document.getElementById('viewCommentDario').innerText = d.commentDario || "Noch kein Kommentar";
+    document.getElementById('viewRatingDario').innerText = d.ratingDario ? `(${d.ratingDario})` : "";
+    
     document.getElementById('viewCommentLuci').innerText = d.commentLuci || "Noch kein Kommentar";
+    document.getElementById('viewRatingLuci').innerText = d.ratingLuci ? `(${d.ratingLuci})` : "";
+    
     document.getElementById('viewCommentMarcel').innerText = d.commentMarcel || "Noch kein Kommentar";
+    document.getElementById('viewRatingMarcel').innerText = d.ratingMarcel ? `(${d.ratingMarcel})` : "";
 
     ['Greg', 'Dario', 'Luci', 'Marcel'].forEach(name => {
         const el = document.getElementById(`viewComment${name}`);
+        const badge = document.getElementById(`viewRating${name}`);
+        
         el.style.color = d[`comment${name}`] ? '#333' : '#9aa0a6';
         el.style.fontStyle = d[`comment${name}`] ? 'normal' : 'italic';
+        
+        badge.style.color = 'white';
+        if(d[`rating${name}`] === 'A') badge.style.backgroundColor = '#34a853';
+        else if(d[`rating${name}`] === 'B') badge.style.backgroundColor = '#fbbc05';
+        else if(d[`rating${name}`] === 'C') badge.style.backgroundColor = '#ea4335';
+        else badge.style.backgroundColor = 'transparent';
     });
 
     document.getElementById('viewSection').scrollIntoView({ behavior: 'smooth' });
@@ -242,6 +272,60 @@ async function toggleReadStatus(id, isRead) {
     loadDatabase();
 }
 
+// --- EXCEL EXPORT FUNKTION (mit dynamischer Spaltenbreite, ohne Berufserfahrung) ---
+function exportExcelFull() {
+    const dataForExcel = allResumes
+        .filter(r => r.secure && r.name !== "🔒 Gesperrt")
+        .map(r => {
+            return {
+                "Name": r.name,
+                "Geburtsdatum": r.birthDate || "",
+                "E-Mail": r.email || "",
+                "Telefon": r.phone || "",
+                "Adresse": r.address || "",
+                // Berufserfahrung ist jetzt komplett entfernt
+                "Bewertung Greg": r.ratingGreg || "",
+                "Kommentar Greg": r.commentGreg || "",
+                "Bewertung Dario": r.ratingDario || "",
+                "Kommentar Dario": r.commentDario || "",
+                "Bewertung Luci": r.ratingLuci || "",
+                "Kommentar Luci": r.commentLuci || "",
+                "Bewertung Marcel": r.ratingMarcel || "",
+                "Kommentar Marcel": r.commentMarcel || ""
+            };
+        });
+
+    if (dataForExcel.length === 0) return alert("Keine Daten zum Exportieren vorhanden.");
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+    
+    // Spaltenbreiten berechnen
+    const colWidths = [];
+    const keys = Object.keys(dataForExcel[0] || {});
+    
+    keys.forEach(key => {
+        let maxWidth = key.length; // Header-Länge als Minimum
+        dataForExcel.forEach(row => {
+            const cellValue = row[key] ? String(row[key]) : "";
+            const lines = cellValue.split('\n'); // Bei mehrzeiligem Text die längste Zeile nehmen
+            lines.forEach(line => {
+                if (line.length > maxWidth) {
+                    maxWidth = line.length;
+                }
+            });
+        });
+        // Maximal 60 Zeichen Breite, damit es übersichtlich bleibt
+        colWidths.push({ wch: Math.min(maxWidth + 2, 60) }); 
+    });
+    
+    worksheet['!cols'] = colWidths; // Breiten dem Arbeitsblatt zuweisen
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bewerber_Komplett");
+    XLSX.writeFile(workbook, "Bewerber_Datenbank.xlsx");
+}
+
+// --- EVENT LISTENERS ---
 document.getElementById('masterPassword').addEventListener('keypress', (e) => { 
     if(e.key === 'Enter') unlockVault(); 
 });
