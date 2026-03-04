@@ -6,7 +6,7 @@ body {
     display: flex; justify-content: center;
 }
 
-.container { width: 100%; max-width: 900px; transition: filter 0.4s ease; }
+.container { width: 100%; max-width: 1000px; transition: filter 0.4s ease; }
 .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 25px; }
 
 .hidden { display: none !important; }
@@ -69,15 +69,16 @@ button:hover { background-color: #1557b0; }
 .comments-stack { display: flex; flex-direction: column; gap: 15px; } 
 .field { display: flex; flex-direction: column; gap: 5px; }
 .checkbox-cell { width: 50px; text-align: center; }
-.num-cell { width: 30px; text-align: center; color: #888; font-weight: bold; } 
 input[type="checkbox"] { cursor: pointer; transform: scale(1.3); }
 
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+/* Table Container with overflow prevention */
+.table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; min-width: 650px; }
+th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; max-width: 250px; }
+th:last-child, td:last-child { padding-right: 25px; } /* Verhindert das Abschneiden rechts */
 th { background-color: #f8f9fa; color: #5f6368; font-size: 0.85em; text-transform: uppercase; }
 .clickable-row { transition: background 0.2s; }
 .clickable-row:hover { background-color: #f8faff; cursor: pointer; }
-.is-read { opacity: 0.6; background-color: #fafafa; }
 
 /* Ansichts-Elemente & Kommentare */
 .view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -95,3 +96,19 @@ th { background-color: #f8f9fa; color: #5f6368; font-size: 0.85em; text-transfor
 .comment-input-row { display: flex; gap: 10px; align-items: flex-start; }
 .rating-select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: white; height: 100%; box-sizing: border-box; }
 textarea { flex-grow: 1; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical; }
+
+/* Tabellen-Steuerung (Suchen & Sortieren) */
+.table-controls { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e8eaed; }
+.search-input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; flex-grow: 1; max-width: 300px; font-size: 0.95em; }
+.sort-buttons { display: flex; gap: 5px; }
+.btn-sort { background-color: white; color: #5f6368; border: 1px solid #dadce0; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; }
+.btn-sort.active { background-color: #e8f0fe; border-color: #1a73e8; color: #1a73e8; font-weight: bold; }
+.btn-sort:hover:not(.active) { background-color: #f1f3f4; }
+
+/* Mini-Ratings übereinander (Tabelle) */
+.ratings-stack { display: flex; flex-direction: column; gap: 3px; font-size: 0.75em; width: 45px; }
+.rating-mini { padding: 2px 4px; border-radius: 3px; color: white; text-align: center; font-weight: bold; border: 1px solid transparent; }
+.rating-mini.A { background-color: #34a853; }
+.rating-mini.B { background-color: #fbbc05; }
+.rating-mini.C { background-color: #ea4335; }
+.rating-mini.none { background-color: transparent; border-color: #ddd; color: #aaa; font-weight: normal; }

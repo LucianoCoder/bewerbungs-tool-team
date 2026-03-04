@@ -1,6 +1,7 @@
 let vaultKey = ""; 
 let allResumes = [];
 let currentApplicantIndex = -1; 
+let currentSort = 'asc'; // Standard-Sortierung auf A-Z geändert
 
 // --- TRESOR LOGIK ---
 async function unlockVault() {
@@ -66,25 +67,66 @@ async function loadDatabase() {
 }
 
 function renderList(rawData) {
-    const tbody = document.getElementById('savedResumesBody');
-    
-    allResumes = rawData.map(item => {
+    // Wandelt die Rohdaten um und speichert den originalIndex für saubere Zuordnungen
+    allResumes = rawData.map((item, index) => {
         if (item.encryptedData) {
             const dec = decrypt(item.encryptedData);
-            return dec ? { ...item, ...dec, secure: true } : { ...item, name: "🔒 Gesperrt", email: "🔒 Gesperrt", birthDate: "🔒 Gesperrt", secure: false };
+            return dec ? { ...item, ...dec, secure: true, originalIndex: index } : { ...item, name: "🔒 Gesperrt", email: "🔒 Gesperrt", birthDate: "🔒 Gesperrt", secure: false, originalIndex: index };
         }
-        return { ...item, secure: true, old: true };
+        return { ...item, secure: true, old: true, originalIndex: index };
     });
 
-    tbody.innerHTML = allResumes.map((r, i) => `
-        <tr class="clickable-row ${r.isRead ? 'is-read' : ''}" onclick="showDetails(${i})">
+    applyFilters();
+}
+
+// --- FILTER & SORTIERUNG ---
+function setSort(type) {
+    currentSort = type;
+    document.querySelectorAll('.btn-sort').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('btnSort-' + type).classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = allResumes.filter(r => r.name && r.name.toLowerCase().includes(term));
+    
+    if (currentSort === 'asc') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (currentSort === 'desc') {
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+    } else {
+        filtered.sort((a, b) => a.originalIndex - b.originalIndex); // Falls man es intern doch noch braucht
+    }
+
+    drawTable(filtered);
+}
+
+function drawTable(dataToDraw) {
+    const tbody = document.getElementById('savedResumesBody');
+    const counterEl = document.getElementById('candidateCounter');
+    
+    // Counter aktualisieren
+    counterEl.innerText = dataToDraw.length + (dataToDraw.length === 1 ? " Bewerber" : " Bewerber");
+    
+    tbody.innerHTML = dataToDraw.map((r) => `
+        <tr class="clickable-row" onclick="showDetails(${r.originalIndex})">
             <td class="checkbox-cell" onclick="event.stopPropagation()">
                 <input type="checkbox" ${r.isRead ? 'checked' : ''} onchange="toggleReadStatus('${r._id}', this.checked)">
             </td>
-            <td class="num-cell">${i + 1}</td> <td>${r.birthDate || '—'}</td>
+            <td>
+                <div class="ratings-stack">
+                    <div class="rating-mini ${r.ratingGreg || 'none'}">G: ${r.ratingGreg || '-'}</div>
+                    <div class="rating-mini ${r.ratingDario || 'none'}">D: ${r.ratingDario || '-'}</div>
+                    <div class="rating-mini ${r.ratingLuci || 'none'}">L: ${r.ratingLuci || '-'}</div>
+                    <div class="rating-mini ${r.ratingMarcel || 'none'}">M: ${r.ratingMarcel || '-'}</div>
+                </div>
+            </td>
+            <td>${r.birthDate || '—'}</td>
             <td><strong>${r.name || 'Unbekannt'}</strong></td>
             <td>${r.email || '—'}</td>
-            <td onclick="event.stopPropagation()">
+            <td style="text-align: center; padding-right: 20px;" onclick="event.stopPropagation()">
                 <button class="btn-delete-icon" onclick="deleteResume('${r._id}')" title="Löschen">🗑️</button>
             </td>
         </tr>
@@ -240,10 +282,10 @@ function showView(d) {
     document.getElementById('viewSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-function showDetails(i) { 
-    if (allResumes[i].secure) {
-        currentApplicantIndex = i;
-        showView(allResumes[i]);
+function showDetails(originalIndex) { 
+    if (allResumes[originalIndex].secure) {
+        currentApplicantIndex = originalIndex;
+        showView(allResumes[originalIndex]);
     } else {
         alert("Zugriff verweigert: Falsches Passwort oder beschädigte Daten."); 
     }
@@ -272,7 +314,7 @@ async function toggleReadStatus(id, isRead) {
     loadDatabase();
 }
 
-// --- EXCEL EXPORT FUNKTION (mit dynamischer Spaltenbreite, ohne Berufserfahrung) ---
+// --- EXCEL EXPORT FUNKTION ---
 function exportExcelFull() {
     const dataForExcel = allResumes
         .filter(r => r.secure && r.name !== "🔒 Gesperrt")
@@ -283,7 +325,6 @@ function exportExcelFull() {
                 "E-Mail": r.email || "",
                 "Telefon": r.phone || "",
                 "Adresse": r.address || "",
-                // Berufserfahrung ist jetzt komplett entfernt
                 "Bewertung Greg": r.ratingGreg || "",
                 "Kommentar Greg": r.commentGreg || "",
                 "Bewertung Dario": r.ratingDario || "",
@@ -299,26 +340,24 @@ function exportExcelFull() {
 
     const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
     
-    // Spaltenbreiten berechnen
     const colWidths = [];
     const keys = Object.keys(dataForExcel[0] || {});
     
     keys.forEach(key => {
-        let maxWidth = key.length; // Header-Länge als Minimum
+        let maxWidth = key.length; 
         dataForExcel.forEach(row => {
             const cellValue = row[key] ? String(row[key]) : "";
-            const lines = cellValue.split('\n'); // Bei mehrzeiligem Text die längste Zeile nehmen
+            const lines = cellValue.split('\n'); 
             lines.forEach(line => {
                 if (line.length > maxWidth) {
                     maxWidth = line.length;
                 }
             });
         });
-        // Maximal 60 Zeichen Breite, damit es übersichtlich bleibt
         colWidths.push({ wch: Math.min(maxWidth + 2, 60) }); 
     });
     
-    worksheet['!cols'] = colWidths; // Breiten dem Arbeitsblatt zuweisen
+    worksheet['!cols'] = colWidths; 
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Bewerber_Komplett");

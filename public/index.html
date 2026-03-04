@@ -138,15 +138,25 @@
                 </div>
             </div>
             
+            <div class="table-controls">
+                <div id="candidateCounter" style="font-weight: bold; color: #1a73e8; font-size: 1.1em; padding-right: 15px; margin-right: auto;">0 Bewerber</div>
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Nach Name suchen..." onkeyup="applyFilters()">
+                <div class="sort-buttons">
+                    <button id="btnSort-asc" class="btn-sort active" onclick="setSort('asc')">A-Z</button>
+                    <button id="btnSort-desc" class="btn-sort" onclick="setSort('desc')">Z-A</button>
+                </div>
+            </div>
+
             <div class="table-container">
                 <table id="savedResumesTable">
                     <thead>
                         <tr>
                             <th class="checkbox-cell">E-Mail geschickt</th>
-                            <th class="num-cell">#</th> <th>Geburtsdatum</th>
+                            <th>Bewertungen</th>
+                            <th>Geburtsdatum</th>
                             <th>Name</th>
                             <th>E-Mail</th>
-                            <th style="width: 50px;"></th> 
+                            <th style="width: 70px; padding-right: 20px; text-align: center;"></th> 
                         </tr>
                     </thead>
                     <tbody id="savedResumesBody"></tbody>
