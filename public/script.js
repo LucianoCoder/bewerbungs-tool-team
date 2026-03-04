@@ -1,7 +1,7 @@
 let vaultKey = ""; 
 let allResumes = [];
 let currentApplicantIndex = -1; 
-let currentSort = 'asc'; // Standard-Sortierung auf A-Z geändert
+let currentSort = 'newest'; // Standard-Sortierung: Neueste Bewerber zuerst!
 
 // --- TRESOR LOGIK ---
 async function unlockVault() {
@@ -93,11 +93,23 @@ function applyFilters() {
     let filtered = allResumes.filter(r => r.name && r.name.toLowerCase().includes(term));
     
     if (currentSort === 'asc') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     } else if (currentSort === 'desc') {
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+    } else if (currentSort === 'oldest') {
+        // Älteste zuerst (basierend auf uploadDate oder Index-Fallback)
+        filtered.sort((a, b) => {
+            const timeA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
+            const timeB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
+            return timeA === timeB ? a.originalIndex - b.originalIndex : timeA - timeB;
+        });
     } else {
-        filtered.sort((a, b) => a.originalIndex - b.originalIndex); // Falls man es intern doch noch braucht
+        // Neueste zuerst (Standard)
+        filtered.sort((a, b) => {
+            const timeA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
+            const timeB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
+            return timeA === timeB ? b.originalIndex - a.originalIndex : timeB - timeA;
+        });
     }
 
     drawTable(filtered);

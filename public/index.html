@@ -142,7 +142,9 @@
                 <div id="candidateCounter" style="font-weight: bold; color: #1a73e8; font-size: 1.1em; padding-right: 15px; margin-right: auto;">0 Bewerber</div>
                 <input type="text" id="searchInput" class="search-input" placeholder="🔍 Nach Name suchen..." onkeyup="applyFilters()">
                 <div class="sort-buttons">
-                    <button id="btnSort-asc" class="btn-sort active" onclick="setSort('asc')">A-Z</button>
+                    <button id="btnSort-newest" class="btn-sort active" onclick="setSort('newest')">Neueste</button>
+                    <button id="btnSort-oldest" class="btn-sort" onclick="setSort('oldest')">Älteste</button>
+                    <button id="btnSort-asc" class="btn-sort" onclick="setSort('asc')">A-Z</button>
                     <button id="btnSort-desc" class="btn-sort" onclick="setSort('desc')">Z-A</button>
                 </div>
             </div>
