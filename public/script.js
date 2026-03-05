@@ -1,7 +1,7 @@
 let vaultKey = ""; 
 let allResumes = [];
 let currentApplicantIndex = -1; 
-let currentSort = 'newest'; // Standard-Sortierung: Neueste Bewerber zuerst!
+let currentSort = 'newest';
 
 // --- TRESOR LOGIK ---
 async function unlockVault() {
@@ -67,7 +67,6 @@ async function loadDatabase() {
 }
 
 function renderList(rawData) {
-    // Wandelt die Rohdaten um und speichert den originalIndex für saubere Zuordnungen
     allResumes = rawData.map((item, index) => {
         if (item.encryptedData) {
             const dec = decrypt(item.encryptedData);
@@ -82,29 +81,44 @@ function renderList(rawData) {
 // --- FILTER & SORTIERUNG ---
 function setSort(type) {
     currentSort = type;
-    document.querySelectorAll('.btn-sort').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('btnSort-' + type).classList.add('active');
+    applyFilters();
+}
+
+function clearSearchField() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = "";
     applyFilters();
 }
 
 function applyFilters() {
     const term = document.getElementById('searchInput').value.toLowerCase();
+    const clearBtn = document.getElementById('clearSearch');
+    
+    // X-Button anzeigen/ausblenden
+    clearBtn.style.display = term.length > 0 ? "block" : "none";
     
     let filtered = allResumes.filter(r => r.name && r.name.toLowerCase().includes(term));
     
+    // Spezialfilter: Unvollständige Bewertungen
+    if (currentSort === 'incomplete') {
+        filtered = filtered.filter(r => {
+            return !r.ratingGreg || !r.ratingDario || !r.ratingLuci || !r.ratingMarcel;
+        });
+    }
+
+    // Sortierung
     if (currentSort === 'asc') {
         filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     } else if (currentSort === 'desc') {
         filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
     } else if (currentSort === 'oldest') {
-        // Älteste zuerst (basierend auf uploadDate oder Index-Fallback)
         filtered.sort((a, b) => {
             const timeA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
             const timeB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
             return timeA === timeB ? a.originalIndex - b.originalIndex : timeA - timeB;
         });
     } else {
-        // Neueste zuerst (Standard)
+        // Neueste zuerst (Standard auch bei 'incomplete')
         filtered.sort((a, b) => {
             const timeA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
             const timeB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
@@ -119,7 +133,6 @@ function drawTable(dataToDraw) {
     const tbody = document.getElementById('savedResumesBody');
     const counterEl = document.getElementById('candidateCounter');
     
-    // Counter aktualisieren
     counterEl.innerText = dataToDraw.length + (dataToDraw.length === 1 ? " Bewerber" : " Bewerber");
     
     tbody.innerHTML = dataToDraw.map((r) => `
@@ -326,7 +339,6 @@ async function toggleReadStatus(id, isRead) {
     loadDatabase();
 }
 
-// --- EXCEL EXPORT FUNKTION ---
 function exportExcelFull() {
     const dataForExcel = allResumes
         .filter(r => r.secure && r.name !== "🔒 Gesperrt")
@@ -376,7 +388,6 @@ function exportExcelFull() {
     XLSX.writeFile(workbook, "Bewerber_Datenbank.xlsx");
 }
 
-// --- EVENT LISTENERS ---
 document.getElementById('masterPassword').addEventListener('keypress', (e) => { 
     if(e.key === 'Enter') unlockVault(); 
 });

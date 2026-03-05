@@ -46,23 +46,10 @@ button:hover { background-color: #1557b0; }
     box-shadow: 0 15px 35px rgba(0,0,0,0.15); text-align: center; width: 350px; 
 }
 
-/* Passwort Container und Toggle Button */
-.password-container {
-    position: relative;
-    width: 100%;
-    margin: 20px 0;
-}
-.password-container input { 
-    width: 100%; padding: 12px; padding-right: 45px;
-    border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; 
-}
-.btn-toggle-pw {
-    position: absolute;
-    right: 5px; top: 50%; transform: translateY(-50%);
-    background: transparent; color: #666; border: none;
-    font-size: 1.2em; padding: 5px 10px; cursor: pointer;
-}
-.btn-toggle-pw:hover { background: transparent; color: #333; }
+/* Passwort Container */
+.password-container { position: relative; width: 100%; margin: 20px 0; }
+.password-container input { width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+.btn-toggle-pw { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; color: #666; border: none; font-size: 1.2em; padding: 5px 10px; cursor: pointer; }
 
 /* Grid & Tables */
 .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -71,16 +58,16 @@ button:hover { background-color: #1557b0; }
 .checkbox-cell { width: 50px; text-align: center; }
 input[type="checkbox"] { cursor: pointer; transform: scale(1.3); }
 
-/* Table Container with overflow prevention */
+/* Table Container */
 .table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
 table { width: 100%; border-collapse: collapse; min-width: 650px; }
 th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; max-width: 250px; }
-th:last-child, td:last-child { padding-right: 25px; } /* Verhindert das Abschneiden rechts */
+th:last-child, td:last-child { padding-right: 25px; }
 th { background-color: #f8f9fa; color: #5f6368; font-size: 0.85em; text-transform: uppercase; }
 .clickable-row { transition: background 0.2s; }
 .clickable-row:hover { background-color: #f8faff; cursor: pointer; }
 
-/* Ansichts-Elemente & Kommentare */
+/* Ansichts-Elemente */
 .view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .view-item { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #e8eaed; }
 .view-item span { color: #5f6368; display: block; font-size: 0.85em; margin-bottom: 3px; }
@@ -89,23 +76,33 @@ th { background-color: #f8f9fa; color: #5f6368; font-size: 0.85em; text-transfor
 .comment-box { background: #f4f6f8; border-left: 4px solid #1a73e8; padding: 12px; border-radius: 0 6px 6px 0; }
 .comment-box strong { display: flex; align-items: center; color: #1a73e8; font-size: 0.9em; text-transform: uppercase; }
 .comment-text { margin-top: 8px; font-size: 0.95em; white-space: pre-wrap; color: #333; min-height: 20px; }
-
 .rating-badge { margin-left: 8px; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
 
-/* Neue Kommentar Eingabe mit Dropdown */
+/* Kommentar Eingabe */
 .comment-input-row { display: flex; gap: 10px; align-items: flex-start; }
 .rating-select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: white; height: 100%; box-sizing: border-box; }
 textarea { flex-grow: 1; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical; }
 
 /* Tabellen-Steuerung (Suchen & Sortieren) */
-.table-controls { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e8eaed; }
-.search-input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; flex-grow: 1; max-width: 300px; font-size: 0.95em; }
-.sort-buttons { display: flex; gap: 5px; }
-.btn-sort { background-color: white; color: #5f6368; border: 1px solid #dadce0; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; }
-.btn-sort.active { background-color: #e8f0fe; border-color: #1a73e8; color: #1a73e8; font-weight: bold; }
-.btn-sort:hover:not(.active) { background-color: #f1f3f4; }
+.table-controls { 
+    display: flex; justify-content: flex-end; align-items: center; 
+    margin-bottom: 15px; gap: 12px; flex-wrap: wrap; 
+    background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #e8eaed; 
+}
 
-/* Mini-Ratings übereinander (Tabelle) */
+/* Suche mit Lösch-Button */
+.search-container { position: relative; flex-grow: 1; max-width: 300px; }
+.search-input { width: 100%; padding: 9px 35px 9px 12px; border: 1px solid #dadce0; border-radius: 6px; font-size: 0.95em; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+.search-input:focus { border-color: #1a73e8; }
+.search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #9aa0a6; font-size: 14px; display: none; padding: 5px; }
+.search-clear:hover { color: #3c4043; }
+
+/* Dropdown Styling */
+.sort-select { padding: 9px 12px; border: 1px solid #dadce0; border-radius: 6px; background-color: white; color: #3c4043; font-size: 0.9em; outline: none; cursor: pointer; min-width: 220px; transition: all 0.2s; }
+.sort-select:hover { background-color: #f1f3f4; border-color: #1a73e8; }
+.sort-select:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
+
+/* Mini-Ratings */
 .ratings-stack { display: flex; flex-direction: column; gap: 3px; font-size: 0.75em; width: 45px; }
 .rating-mini { padding: 2px 4px; border-radius: 3px; color: white; text-align: center; font-weight: bold; border: 1px solid transparent; }
 .rating-mini.A { background-color: #34a853; }

@@ -140,13 +140,19 @@
             
             <div class="table-controls">
                 <div id="candidateCounter" style="font-weight: bold; color: #1a73e8; font-size: 1.1em; padding-right: 15px; margin-right: auto;">0 Bewerber</div>
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Nach Name suchen..." onkeyup="applyFilters()">
-                <div class="sort-buttons">
-                    <button id="btnSort-newest" class="btn-sort active" onclick="setSort('newest')">Neueste</button>
-                    <button id="btnSort-oldest" class="btn-sort" onclick="setSort('oldest')">Älteste</button>
-                    <button id="btnSort-asc" class="btn-sort" onclick="setSort('asc')">A-Z</button>
-                    <button id="btnSort-desc" class="btn-sort" onclick="setSort('desc')">Z-A</button>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Nach Name suchen..." onkeyup="applyFilters()">
+                    <span id="clearSearch" class="search-clear" onclick="clearSearchField()">✕</span>
                 </div>
+
+                <select id="sortDropdown" class="sort-select" onchange="setSort(this.value)">
+                    <option value="newest">Sortierung: Neueste zuerst</option>
+                    <option value="oldest">Sortierung: Älteste zuerst</option>
+                    <option value="asc">Name: A bis Z</option>
+                    <option value="desc">Name: Z bis A</option>
+                    <option value="incomplete">⚠️ Unvollständige Bewertung</option>
+                </select>
             </div>
 
             <div class="table-container">
